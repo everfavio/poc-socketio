@@ -1,9 +1,8 @@
 const express = require('express');
 const app = express();
 const http = require('http');
-const { createClient } = require('redis');
-const { createAdapter } = require('@socket.io/redis-adapter');
 const server = http.createServer(app);
+const redis = require('redis');
 const { Server } = require('socket.io');
 const io = new Server(server);
 const bodyParser = require('body-parser');
@@ -12,6 +11,13 @@ app.use((req, res, next) => {
   res.io = io;
   next();
 });
+
+
+const { Emitter } = require("@socket.io/redis-emitter");
+const { createClient } = require("redis");
+
+const redisClient = createClient();
+// const io = new Emitter(redisClient);
 
 
 app.post('/notifications', (req, res) => {
@@ -24,8 +30,6 @@ app.post('/notifications', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
-
-
 
 io.on('connection', (socket) => {
   console.log('a user connected');
